@@ -1,23 +1,36 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import { FaChartBar } from 'react-icons/fa'; // Importing a chart icon
+import TextGenerationPage from './TextGenerationPage';
 import './App.css';
 
 function App() {
+  const [showStatisticalAnalysis, setShowStatisticalAnalysis] = useState(false);
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <div className="app-header-content">
+          <FaChartBar className="app-logo" /> {/* Chart icon as a logo */}
+          <h1>Quantitative text analysis</h1>
+        </div>
+        <nav>
+          <ul className="nav-list">
+            <li><a href="#tokenization">Tokenization</a></li>
+            <li><a href="#tokenFrequency">Token Frequency Analysis</a></li>
+            <li>
+              <a href="#/" onClick={(e) => {
+                e.preventDefault();
+                setShowStatisticalAnalysis(prevState => !prevState);
+              }}>
+                Statistical Text Analysis
+              </a>
+            </li>
+          </ul>
+        </nav>
       </header>
+      <main>
+        <TextGenerationPage showStatisticalAnalysis={showStatisticalAnalysis} />
+      </main>
     </div>
   );
 }
