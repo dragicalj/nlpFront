@@ -14,44 +14,45 @@ function CustomHeader() {
         <Box w='50%' p={4} borderRadius='8px' color='white'>
             <Flex align='center'>
                 <Box mt='2%' mr='3%'>
-                <FaChartBar className="app-logo" />
+                    <FaChartBar className="app-logo" />
                 </Box>
-                <Text fontSize='4xl' fontWeight='bold' letterSpacing='wide'>
-                Quantitative Text Analysis
-                </Text>
+                    <Text fontSize='4xl' fontWeight='bold' letterSpacing='wide'>
+                        Quantitative Text Analysis
+                    </Text>
             </Flex>
         </Box>
         <Box w='50%' mt='2%' as="nav">
         <Flex as="ul" listStyleType="none" m={0} p={0} ml='15%'>
             <Box as="li" mr={30} >
-            <Link href="#tokenization" color="white" textDecoration="none" onClick={(e) => {
-                    e.preventDefault();
-                    navigate('/frek'); 
-                }}fontSize='large'>
-                Tokenization
-            </Link>
+                <Link href="#tokenization" color="white" textDecoration="none" onClick={(e) => {
+                        e.preventDefault();
+                        navigate('/frek'); 
+                    }}
+                    fontSize='large'>
+                    Tokenization
+                </Link>
             </Box>
             <Box as="li" mr={30} >
-            <Link href="#tokenFrequency" color="white" textDecoration="none" fontSize='large'>
-                Token Frequency Analysis
-            </Link>
+                <Link href="#tokenFrequency" color="white" textDecoration="none" fontSize='large'>
+                    Token Frequency Analysis
+                </Link>
             </Box>
             <Box as="li">
-            <Link
-                href="#/"
-                color="white"
-                textDecoration="none"
-                onClick={(e) => {
-                    e.preventDefault();
-                    navigate('/statistics'); 
-                }}
-                fontSize='large'
-            >
-                Statistical Text Analysis
-            </Link>
+                <Link
+                    href="#/"
+                    color="white"
+                    textDecoration="none"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigate('/statistics'); 
+                    }}
+                    fontSize='large'
+                >
+                    Statistical Text Analysis
+                </Link>
             </Box>
-            </Flex>
-         </Box>
+        </Flex>
+        </Box>
         </Flex>
     </Heading>
   );

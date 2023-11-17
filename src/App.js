@@ -16,14 +16,13 @@ function App() {
   return (
     <Flex flexDir='column' h='100%'>
       <Router>
-                <CustomHeader />
-                <Routes>
+            <CustomHeader />
+              <Routes>
                 <Route path="/statistics" element={<Stati />} />
                 <Route path="/frek" element={<Fr />} />
-
-            <Route path="/" element={<TextGenerationPage />} />
-                </Routes>
-            </Router>
+                <Route path="/" element={<TextGenerationPage />} />
+              </Routes>
+      </Router>
     </Flex>
   );
 }
