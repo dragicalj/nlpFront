@@ -2,36 +2,29 @@ import React, { useState } from 'react';
 import { FaChartBar } from 'react-icons/fa'; // Importing a chart icon
 import TextGenerationPage from './TextGenerationPage';
 import './App.css';
+import CustomHeader from './components/CustomHeader';
+import {Flex} from '@chakra-ui/react';
+import Stati from './components/Stati'; // Import your Statistics component
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Fr from './components/Fr';
+
+
 
 function App() {
   const [showStatisticalAnalysis, setShowStatisticalAnalysis] = useState(false);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <div className="app-header-content">
-          <FaChartBar className="app-logo" /> {/* Chart icon as a logo */}
-          <h1>Quantitative text analysis</h1>
-        </div>
-        <nav>
-          <ul className="nav-list">
-            <li><a href="#tokenization">Tokenization</a></li>
-            <li><a href="#tokenFrequency">Token Frequency Analysis</a></li>
-            <li>
-              <a href="#/" onClick={(e) => {
-                e.preventDefault();
-                setShowStatisticalAnalysis(prevState => !prevState);
-              }}>
-                Statistical Text Analysis
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </header>
-      <main>
-        <TextGenerationPage showStatisticalAnalysis={showStatisticalAnalysis} />
-      </main>
-    </div>
+    <Flex flexDir='column' h='100%'>
+      <Router>
+                <CustomHeader />
+                <Routes>
+                <Route path="/statistics" element={<Stati />} />
+                <Route path="/frek" element={<Fr />} />
+
+            <Route path="/" element={<TextGenerationPage />} />
+                </Routes>
+            </Router>
+    </Flex>
   );
 }
 

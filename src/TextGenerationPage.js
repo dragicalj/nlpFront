@@ -1,6 +1,16 @@
-import React, { useState } from 'react';
-import { FaUpload, FaPaperPlane,FaChartBar  } from 'react-icons/fa';
-import './TextGenerationPage.css';
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  Heading,
+  Input,
+  Stack,
+  Text,
+  Textarea,
+} from "@chakra-ui/react";
+import { FaChartBar, FaPaperPlane, FaUpload } from "react-icons/fa";
+import { useState } from "react";
 
 const TextGenerationPage = ({ showStatisticalAnalysis }) => {
   const [uploadedText, setUploadedText] = useState('');
@@ -74,95 +84,124 @@ const TextGenerationPage = ({ showStatisticalAnalysis }) => {
     const maxFrequency = Math.max(...graphData.map(item => item.frequency)) + 5; // Calculate max frequency and add some padding
 
   return (
-    <div className="text-generation-page">
-      <div className="left-section">
-        <div className="text-editor">
-          <textarea value={uploadedText} readOnly />
-        </div>
-      </div>
-      <div className="right-section">
-        {showStatisticalAnalysis ? (
-          <div className="statistical-analysis-container">
-           <div className="statistical-analysis">
-              <div className="calculation-section">
-                <button onClick={() => calculateEntropy(uploadedText)}>Calculate the entropy of the text</button>
-                <span className="result-field" >{entropyResult}</span>
-              </div>
-              <div className="calculation-section">
-                <button onClick={() => calculateShannonsEntropy(uploadedText)}>Calculate Shannon's entropy</button>
-                <span className="result-field">{shannonsEntropyResult}</span>
-              </div>
-            </div>
-
-            <div className="zipf-section">
-              <button onClick={handleDrawZipfGraph}>
-                <FaChartBar />
-                Draw Zipf Distribution Graph
-              </button>
-              {showGraph && (
-                <div className="graph-container">
-                <svg viewBox={`0 0 ${graphData.length * barWidth} ${maxFrequency + 10}`} className="graph-placeholder">
-                    {/* Draw bars */}
-                    {graphData.map((item, index) => (
-                      <rect 
-                        key={index} 
-                        x={index * barWidth + 10} 
-                        y={maxFrequency - item.frequency} 
-                        width={barWidth - 2}
-                        height={item.frequency} 
-                        fill="#007bff"
-                      />
-                    ))}
-                    {/* X-axis */}
-                    <line x1="0" y1={maxFrequency} x2={graphData.length * barWidth} y2={maxFrequency} stroke="black"/>
-                    {/* Y-axis */}
-                    <line x1="10" y1="0" x2="10" y2={maxFrequency} stroke="black"/>
-                    {/* X-axis labels */}
-                    {graphData.map((item, index) => (
-                      <text
-                        key={index}
-                        x={index * barWidth + 10}
-                        y={maxFrequency + 10}
-                        fontSize="5"
-                        textAnchor="middle"
-                      >
-                        {item.word}
-                      </text>
-                    ))}
-                    {/* Y-axis labels (frequency scale) */}
-                    {/* Adjust as needed for your scale */}
-                    <text x="5" y={maxFrequency / 2} fontSize="5" textAnchor="end">{maxFrequency / 2}</text>
-                    <text x="5" y={maxFrequency} fontSize="5" textAnchor="end">{maxFrequency}</text>
-                  </svg>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="upload-section">
-              <label className="upload-label" htmlFor="fileInput">
-                <FaUpload className="upload-icon" />
+    <Flex flexDir='row' p={4} bg="white" borderRadius="10px">
+    <Box flex="1" mr={4} w='40%'>
+        <Stack align="center" spacing={6}>
+          <Box mt='2%'>
+          <Heading as="h3" size="2xl" color="#00693E" fontWeight="bold" fontStyle="italic">
+          Local upload:
+          </Heading>
+              <Button
+                as="label"
+                htmlFor="fileInput"
+                bg="#ffffff"
+                borderWidth="3px"
+                borderStyle="dashed"
+                borderColor="#306aa3"
+                borderRadius="12px"
+                cursor="pointer"
+                transition="border 0.3s ease-in-out"
+                _hover={{ borderColor: "#306aa3" }}
+                h='60px'
+                w='400px'
+              >
+                <FaUpload fontSize="2em" mb={2} color="#306aa3" />
                 Click to Upload
-              </label>
-              <input type="file" id="fileInput" accept=".txt" onChange={handleFileUpload} />
-            </div>
-            <div className="chat-container">
-              <div className="chat-history">
-                <div className="message user-message">User: {userMessage}</div>
-                <div className="message chatgpt-message">ChatGPT: {generatedText}</div>
-              </div>
-              <div className="user-input">
-                <textarea placeholder="Type your message..." value={userMessage} onChange={(e) => setUserMessage(e.target.value)} />
-                <button onClick={handleSendMessage}>
+              </Button>
+              <Input
+                hidden
+                type="file"
+                id="fileInput"
+                accept=".txt"
+                onChange={(e) => handleFileUpload(e)}
+              />
+          </Box>
+          <Box  mt='15%' ml={25} >
+          <Flex direction="column">
+          
+          <Heading as="h3" size="2xl" color="#00693E" fontWeight="bold" fontStyle="italic">
+            ChatGPT text generator:
+          </Heading>
+          <Box>
+          <Text fontSize="l" color="#306aa3" fontWeight="bold">
+            ChatGPT:
+          </Text>
+          </Box>
+            
+          <Box
+            mb={4}
+            backgroundColor='#306aa3'
+            borderRadius="10px"
+            w='93%'
+            h='50px'
+          >
+            <Flex ml={5}>
+              <Text color="white" mr={2} ml={5}>
+                 Hello! How can I assist you today?
+              </Text>
+            </Flex>
+          </Box>
+          <Box>
+          <Text fontSize="l" color="#306aa3" fontWeight="bold">
+            User:
+          </Text>
+          </Box>
+              <Flex alignItems="center">
+                <Textarea
+                  placeholder="Type your message..."
+                  value={userMessage}
+                  onChange={(e) => setUserMessage(e.target.value)}
+                  borderWidth="2px"
+                  borderRadius="8px"
+                  fontSize="16px"
+                  color="#495057"
+                  h="70px"
+                  resize="none"
+                  w='400px'
+                  p={2}
+                  borderColor="#306aa3"
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  bg="#306aa3"
+                  color="white"
+                  border="none"
+                  borderRadius="8px"
+                  p={2}
+                  ml={5}
+                  cursor="pointer"
+                  fontSize="22px"
+                  transition="background-color 0.2s"
+                  _hover={{ backgroundColor: "#0056b3" }}
+                >
                   <FaPaperPlane />
-                </button>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+                </Button>
+              </Flex>
+            </Flex>
+          </Box>
+        </Stack>
+    </Box>
+    <Box  w='60%' mr='4%'>
+    <Heading as="h3" size="2xl" color="#00693E" fontWeight="bold" fontStyle="italic">
+      Text for Analysis
+    </Heading>
+      <Stack spacing={4}>
+        <Textarea
+          value={uploadedText}
+          readOnly
+          height="470px"
+          resize="none"
+          borderWidth="2px"
+          borderColor="#306aa3"
+          borderRadius="8px"
+          fontSize="16px"
+          color="#495057"
+          overflowY="scroll"
+          mt={10}
+        />
+      </Stack>
+    </Box>
+  </Flex>
   );
 };
 
