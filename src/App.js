@@ -1,29 +1,48 @@
 import React, { useState } from 'react';
-import { FaChartBar } from 'react-icons/fa'; // Importing a chart icon
-import TextGenerationPage from './TextGenerationPage';
-import './App.css';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate
+} from 'react-router-dom';
+
+import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
 import CustomHeader from './components/CustomHeader';
-import {Flex} from '@chakra-ui/react';
-import Stati from './components/Stati'; // Import your Statistics component
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Fr from './components/Fr';
-
-
+import TextGenerationPage from './components/TextGenerationPage';
+import Statistical from './components/Statistical';
+import Categories from './components/Categories';
+import CompareCategories from './components/CompareCategories';
+import Frequency from './components/Frequency';
 
 function App() {
-  const [showStatisticalAnalysis, setShowStatisticalAnalysis] = useState(false);
+  const [isLoggedIn, setLoggedIn] = useState(false);
+  const [sharedText, setSharedText] = useState('');
+  const[textId, setTextId]=useState(''); // Dodajemo stanje za zadržavanje teksta
 
   return (
-    <Flex flexDir='column' h='100%'>
-      <Router>
-            <CustomHeader />
-              <Routes>
-                <Route path="/statistics" element={<Stati />} />
-                <Route path="/frek" element={<Fr />} />
-                <Route path="/" element={<TextGenerationPage />} />
-              </Routes>
-      </Router>
-    </Flex>
+    <Router>
+      {isLoggedIn && <CustomHeader />}
+
+      <Routes>
+        <Route path="/login" element={<LoginPage onLogin={() => setLoggedIn(true)} />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/" element={!isLoggedIn ? <Navigate to="/login" /> : <Navigate to="/home" />} />
+
+        {isLoggedIn ? (
+          <>
+            <Route path="/home" element={<TextGenerationPage setSharedText={setSharedText} setTextId={setTextId}/>} /> {/* Prosledite setSharedText */}
+            <Route path="/statistics" element={<Statistical sharedText={sharedText} setSharedText={setSharedText} textId={textId} setTextId={setTextId}/>} />
+            <Route path="/frek" element={<Frequency sharedText={sharedText} setSharedText={setSharedText} textId={textId} setTextId={setTextId}/>} /> {/* Prosledite sharedText */}
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/categoriescompare" element={<CompareCategories />} />
+            <Route path="*" element={<Navigate to="/home" />} />
+          </>
+        ) : (
+          <Route path="*" element={<Navigate to="/login" />} />
+        )}
+      </Routes>
+    </Router>
   );
 }
 
