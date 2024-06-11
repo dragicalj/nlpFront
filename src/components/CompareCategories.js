@@ -20,7 +20,7 @@ const CompareCategories = () => {
   useEffect(() => {
     const fetchScatterData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/shannon_equitability/${userId}/`);
+        const response = await fetch(`http://138.68.107.72:8000/api/shannon_equitability/${userId}/`);
         const data = await response.json();
         setScatterData(data);
       } catch (error) {
@@ -30,7 +30,7 @@ const CompareCategories = () => {
 
     const fetchWordCloudData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/frequent_nouns/${userId}/`);
+        const response = await fetch(`http://138.68.107.72:8000/api/frequent_nouns/${userId}/`);
         const data = await response.json();
         setWordCloudData(data);
       } catch (error) {

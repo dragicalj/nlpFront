@@ -41,7 +41,7 @@ const CategoryCard = ({ categoryId, name, description, numberOfTexts, onViewText
 
   const fetchTexts = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/categories/${categoryId}/texts/?userId=${userId}`);
+      const response = await fetch(`http://138.68.107.72:8000/api/categories/${categoryId}/texts/?userId=${userId}`);
       const data = await response.json();
       setTexts(data);
     } catch (error) {
@@ -51,7 +51,7 @@ const CategoryCard = ({ categoryId, name, description, numberOfTexts, onViewText
 
   const fetchUserTexts = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/user_texts/${userId}/`);
+      const response = await fetch(`http://138.68.107.72:8000/api/user_texts/${userId}/`);
       const data = await response.json();
       setUserTexts(data);
     } catch (error) {
@@ -72,7 +72,7 @@ const CategoryCard = ({ categoryId, name, description, numberOfTexts, onViewText
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/add_text_to_category/', {
+      const response = await fetch('http://138.68.107.72:8000/api/add_text_to_category/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ const CategoryCard = ({ categoryId, name, description, numberOfTexts, onViewText
 
   const handleUpdateCategory = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/categories/${categoryId}/`, {
+      const response = await fetch(`http://138.68.107.72:8000/api/categories/${categoryId}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

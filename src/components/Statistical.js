@@ -52,7 +52,7 @@ const Statistical = ({ sharedText, setSharedText, textId, setTextId }) => {
   useEffect(() => {
     const fetchTexts = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/texts/${userId}/`);
+        const response = await fetch(`http://138.68.107.72:8000/api/texts/${userId}/`);
         const data = await response.json();
         setTexts(data);
       } catch (error) {
@@ -73,7 +73,7 @@ const Statistical = ({ sharedText, setSharedText, textId, setTextId }) => {
     const textId = event.target.value;
     setSelectedTextId(textId);
     try {
-      const response = await fetch(`http://localhost:8000/api/texts2/${textId}/`);
+      const response = await fetch(`http://138.68.107.72:8000/api/texts2/${textId}/`);
       const data = await response.json();
       if (response.ok) {
         setSelectedTextContent(data.content);
@@ -90,7 +90,7 @@ const Statistical = ({ sharedText, setSharedText, textId, setTextId }) => {
 
   const fetchTextMetadata = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/text_entropy_shannon/${id}/`);
+      const response = await fetch(`http://138.68.107.72:8000/api/text_entropy_shannon/${id}/`);
       const data = await response.json();
       if (response.ok) {
         setEntropy(data.entropy);
@@ -105,7 +105,7 @@ const Statistical = ({ sharedText, setSharedText, textId, setTextId }) => {
 
   const handleTokenize = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/tokenize_text_only/', {
+      const response = await fetch('http://138.68.107.72:8000/api/tokenize_text_only/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

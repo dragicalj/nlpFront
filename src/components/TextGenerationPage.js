@@ -65,7 +65,7 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
 
   const handleGenerateText = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/generate_text/?prompt=${encodeURIComponent(userMessage)}`, {
+      const response = await fetch(`http://138.68.107.72:8000/api/generate_text/?prompt=${encodeURIComponent(userMessage)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
     };
   
     try {
-      const response = await fetch('http://localhost:8000/api/create_text/', {
+      const response = await fetch('http://138.68.107.72:8000/api/create_text/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

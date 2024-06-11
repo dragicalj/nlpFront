@@ -25,7 +25,7 @@ function LoginPage({ onLogin }) {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:8000/login/', {
+      const response = await fetch('http://138.68.107.72:8000/login/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

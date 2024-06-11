@@ -10,7 +10,7 @@ const ResultTable = () => {
     useEffect(() => {
         const fetchCategoryStatistics = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/category_statistics/${userId}/`);
+                const response = await fetch(`http://138.68.107.72:8000/api/category_statistics/${userId}/`);
                 const data = await response.json();
                 setCategoryStatistics(data);
             } catch (error) {

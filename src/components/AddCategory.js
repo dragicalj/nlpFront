@@ -25,7 +25,7 @@ const AddCategory = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/categories/');
+        const response = await fetch('http://138.68.107.72:8000/api/categories/');
         const data = await response.json();
         setCategories(data);
       } catch (error) {
