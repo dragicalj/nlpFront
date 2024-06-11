@@ -185,9 +185,9 @@ const CategoryCard = ({ categoryId, name, description, numberOfTexts, onViewText
             <ModalOverlay />
             <ModalContent
               mt='8%'
-              ml='20%'
+              ml='26%'
               width="1000px"
-              maxWidth="1000px"
+              maxWidth="51%"
               h='75%'
               border="2px solid #1f4c76"
               borderRadius='7px'
