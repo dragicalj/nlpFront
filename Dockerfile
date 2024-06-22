@@ -4,20 +4,23 @@ FROM node:20.9
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package.json package-lock.json /app/
+# Copy package.json and yarn.lock to the working directory
+COPY package.json yarn.lock /app/
 
-# Install project dependencies
-RUN npm install
+# Install project dependencies using Yarn
+RUN yarn install
+
+# Output the directory contents to verify installation
+RUN ls -la /app
+RUN ls -la /app/node_modules
+RUN ls -la /app/node_modules/react-scripts
 
 # Copy the rest of the application code to the working directory
 COPY . /app/
 
-# Build the React application
-RUN npm run build
-
 # Expose the port the app runs on
-EXPOSE 3306
+EXPOSE 3000
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
+
