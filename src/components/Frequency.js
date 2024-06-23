@@ -46,6 +46,65 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
     fetchTexts();
   }, [userId]);
 
+  useEffect(() => {
+    const savedTableData = localStorage.getItem('tableData');
+    const savedShowTable = localStorage.getItem('showTable');
+    const savedSelectedPartOfSpeech = localStorage.getItem('selectedPartOfSpeech');
+    const savedSortOrder = localStorage.getItem('sortOrder');
+    const savedFrequencyRange = localStorage.getItem('frequencyRange');
+    const savedFilteredData = localStorage.getItem('filteredData');
+    const savedSelectedTextId = localStorage.getItem('selectedTextId');
+    const savedSelectedTextContent = localStorage.getItem('selectedTextContent');
+    const savedMetadata = localStorage.getItem('metadata');
+
+    if (savedTableData) {
+      setTableData(JSON.parse(savedTableData));
+    }
+    if (savedShowTable) {
+      setShowTable(JSON.parse(savedShowTable));
+    }
+    if (savedSelectedPartOfSpeech) {
+      setSelectedPartOfSpeech(savedSelectedPartOfSpeech);
+    }
+    if (savedSortOrder) {
+      setSortOrder(savedSortOrder);
+    }
+    if (savedFrequencyRange) {
+      setFrequencyRange(JSON.parse(savedFrequencyRange));
+    }
+    if (savedFilteredData) {
+      setFilteredData(JSON.parse(savedFilteredData));
+    }
+    if (savedSelectedTextId) {
+      setSelectedTextId(savedSelectedTextId);
+    }
+    if (savedSelectedTextContent) {
+      setSelectedTextContent(savedSelectedTextContent);
+    }
+    if (savedMetadata) {
+      setMetadata(JSON.parse(savedMetadata));
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      localStorage.setItem('tableData', JSON.stringify(tableData));
+      localStorage.setItem('showTable', JSON.stringify(showTable));
+      localStorage.setItem('selectedPartOfSpeech', selectedPartOfSpeech);
+      localStorage.setItem('sortOrder', sortOrder);
+      localStorage.setItem('frequencyRange', JSON.stringify(frequencyRange));
+      localStorage.setItem('filteredData', JSON.stringify(filteredData));
+      localStorage.setItem('selectedTextId', selectedTextId);
+      localStorage.setItem('selectedTextContent', selectedTextContent);
+      localStorage.setItem('metadata', JSON.stringify(metadata));
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [tableData, showTable, selectedPartOfSpeech, sortOrder, frequencyRange, filteredData, selectedTextId, selectedTextContent, metadata]);
+
   const handleTextSelect = async (event) => {
     const textId = event.target.value;
     setSelectedTextId(textId);
@@ -79,6 +138,10 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
         setShowTable(true);
         fetchTextMetadata(selectedTextId);
         setFilteredData(data);  
+
+        localStorage.setItem('tableData', JSON.stringify(data));
+        localStorage.setItem('showTable', JSON.stringify(true));
+        localStorage.setItem('filteredData', JSON.stringify(data));
       } else {
         console.error('Error tokenizing text:', data.error);
       }
@@ -89,10 +152,11 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
 
   const fetchTextMetadata = async (id) => {
     try {
-      const response = await fetch(`http://138.68.107.72:8000/api/text_metadata/${id}/`);
+      const response = await fetch(`http://138.68.107.72:8000/text_metadata/${id}/`);
       const data = await response.json();
       if (response.ok) {
         setMetadata(data); 
+        localStorage.setItem('metadata', JSON.stringify(data)); 
       } else {
         console.error('Error fetching text metadata:', data.error);
       }
@@ -139,6 +203,7 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
   const handleSearch = () => {
     const filteredAndSortedData = filterAndSortData(tableData);
     setFilteredData(filteredAndSortedData);
+    localStorage.setItem('filteredData', JSON.stringify(filteredAndSortedData));
   };
 
   return (
@@ -215,7 +280,7 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
               <Text mb={2}>Frequency range:</Text>
               <FrequencyRangeSlider onRangeChange={handleFrequencyRangeChange}/>
             </Box>
-            <Button onClick={handleSearch} backgroundColor="#306aa3" color="white" mb='15px' width={'300px'}>Search</Button>
+            <Button onClick={handleSearch} backgroundColor="#306aa3" color="white" mb='15px' width={'300px'}>Apply</Button>
           </Box>
         </Box>
       </Box>

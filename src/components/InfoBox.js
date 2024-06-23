@@ -15,9 +15,9 @@ function InfoBox({ metadata }) {
         <Text>Number of occurrences:</Text>
         <Input placeholder="7722" value={metadata ? metadata.num_occurrences : ''} isReadOnly />
         <Text>Top token:</Text>
-        <Input placeholder="the" value={metadata ? metadata.top_token : ''} isReadOnly />
+        <Input placeholder="," value={metadata ? metadata.top_token : ''} isReadOnly />
         <Text>Top word:</Text>
-        <Input placeholder="love" value={metadata ? metadata.top_word : ''} isReadOnly />
+        <Input placeholder="the" value={metadata ? metadata.top_word : ''} isReadOnly />
       </HStack>
     </Box>
   );

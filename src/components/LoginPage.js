@@ -40,7 +40,16 @@ function LoginPage({ onLogin }) {
         const data = await response.json();
         localStorage.setItem('user_id', data.id);
         console.log('User ID:', data.id); 
-    
+        localStorage.removeItem('tableData');
+        localStorage.removeItem('showTable');
+        localStorage.removeItem('selectedPartOfSpeech');
+        localStorage.removeItem('sortOrder');
+        localStorage.removeItem('frequencyRange');
+        localStorage.removeItem('filteredData');
+        localStorage.removeItem('selectedTextId');
+        localStorage.removeItem('selectedTextContent');
+        localStorage.removeItem('metadata');
+        localStorage.removeItem('shouldLoadState');
         toast({
           title: "Login successful.",
           description: "Welcome back!",

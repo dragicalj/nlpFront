@@ -64,10 +64,43 @@ const Statistical = ({ sharedText, setSharedText, textId, setTextId }) => {
 
 
   useEffect(() => {
-    if (selectedTextId) {
-      fetchTextMetadata(selectedTextId);
+    if (selectedTextContent) {
+      fetchTextMetadataByContent(selectedTextContent);
     }
-  }, [selectedTextId]);
+  }, []); 
+
+  const fetchTextMetadataByContent = async (content) => {
+    try {
+      const response = await fetch(`hhttp://138.68.107.72:8000/api/text_entropy_shannon_by_content/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: content })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setEntropy(data.entropy);
+        setShannonValue(data.shannon_value);
+      } else {
+        toast({
+          title: "Error fetching text metadata.",
+          description: data.error,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error fetching text metadata.",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
   const handleTextSelect = async (event) => {
     const textId = event.target.value;
@@ -263,7 +296,7 @@ const Statistical = ({ sharedText, setSharedText, textId, setTextId }) => {
             boxShadow="md"
             style={{ fontSize: '1.2em' }}
           >
-            Visualize a graph of Zipf's distribution
+            Zipf's distribution
           </Button>
           <Modal isOpen={isOpen} onClose={onClose} size="xl">
             <ModalOverlay />

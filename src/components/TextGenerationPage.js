@@ -38,6 +38,17 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
         setTitle(fileNameWithoutExtension);
         setUploadedText(text);
         setSharedText(text);
+
+        localStorage.removeItem('tableData');
+        localStorage.removeItem('showTable');
+        localStorage.removeItem('selectedPartOfSpeech');
+        localStorage.removeItem('sortOrder');
+        localStorage.removeItem('frequencyRange');
+        localStorage.removeItem('filteredData');
+        localStorage.removeItem('selectedTextId');
+        localStorage.removeItem('selectedTextContent');
+        localStorage.removeItem('metadata');
+        localStorage.removeItem('shouldLoadState');
       } catch (error) {
         console.error('Error reading file:', error);
       }
@@ -76,6 +87,17 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
         setGeneratedText(data.generated_text);
         setUploadedText(data.generated_text); 
         setSharedText(data.generated_text); 
+
+        localStorage.removeItem('tableData');
+        localStorage.removeItem('showTable');
+        localStorage.removeItem('selectedPartOfSpeech');
+        localStorage.removeItem('sortOrder');
+        localStorage.removeItem('frequencyRange');
+        localStorage.removeItem('filteredData');
+        localStorage.removeItem('selectedTextId');
+        localStorage.removeItem('selectedTextContent');
+        localStorage.removeItem('metadata');
+        localStorage.removeItem('shouldLoadState');
       } else {
         console.error('Error generating text:', data.error);
       }
@@ -228,22 +250,23 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
             <Heading as="h3" size="lg" color="#00693E" fontWeight="bold" fontStyle="italic" mb={3}>
               Quick paste:
             </Heading>
-            <Button
-              onClick={handleQuickPaste}
+            <Box
               bg="#ffffff"
               borderWidth="3px"
               borderStyle="dashed"
               borderColor="#306aa3"
               borderRadius="12px"
-              cursor="pointer"
-              transition="border 0.3s ease-in-out"
-              _hover={{ borderColor: "#306aa3" }}
               h='8vh'
               w='100%'
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              transition="border 0.3s ease-in-out"
             >
-              <FaPaste fontSize="2em" mb={2} color="#306aa3" />
-              Click to Paste
-            </Button>
+              <Text fontSize="lg" color="#306aa3" fontWeight="bold">
+              Copy text directly into the input field.
+              </Text>
+            </Box>
           </Box>
         </Stack>
       </Box>
@@ -284,20 +307,32 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
     />
   </Flex>
   <Textarea
-    placeholder="Your text here..."
-    value={uploadedText}
-    readOnly
-    onChange={(e) => setUploadedText(e.target.value)}
-    height="60vh"
-    resize="none"
-    borderWidth="2px"
-    borderColor="#306aa3"
-    borderRadius="8px"
-    fontSize="16px"
-    color="#495057"
-    overflowY="scroll"
-    mt={4}
-  />
+          placeholder="Your text here..."
+          value={uploadedText}
+          onChange={(e) => {
+            setUploadedText(e.target.value);
+            setSharedText(e.target.value);
+            localStorage.removeItem('tableData');
+        localStorage.removeItem('showTable');
+        localStorage.removeItem('selectedPartOfSpeech');
+        localStorage.removeItem('sortOrder');
+        localStorage.removeItem('frequencyRange');
+        localStorage.removeItem('filteredData');
+        localStorage.removeItem('selectedTextId');
+        localStorage.removeItem('selectedTextContent');
+        localStorage.removeItem('metadata');
+        localStorage.removeItem('shouldLoadState');
+          }}
+          height="60vh"
+          resize="none"
+          borderWidth="2px"
+          borderColor="#306aa3"
+          borderRadius="8px"
+          fontSize="16px"
+          color="#495057"
+          overflowY="scroll"
+          mt={4}
+        />
 
   <Modal isOpen={isOpen} onClose={onClose}>
     <ModalOverlay />
