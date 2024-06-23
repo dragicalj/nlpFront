@@ -71,7 +71,7 @@ const Statistical = ({ sharedText, setSharedText, textId, setTextId }) => {
 
   const fetchTextMetadataByContent = async (content) => {
     try {
-      const response = await fetch(`hhttp://138.68.107.72:8000/api/text_entropy_shannon_by_content/`, {
+      const response = await fetch(`http://138.68.107.72:8000/api/text_entropy_shannon_by_content/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
