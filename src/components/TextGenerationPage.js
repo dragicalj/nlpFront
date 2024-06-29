@@ -150,10 +150,10 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
   
   return (
     <Flex flexDir='row' p={4} bg="white" borderRadius="10px">
-      <Box flex="1" mr={4} w={{ base: '100%', md: '40%' }} mt={1}>
+      <Box flex="1" mr={4} w={{ base: '100%', md: '40%' }} mt={12}>
         <Stack align="center" spacing={5}>
           <Box w='80%' textAlign="left">
-            <Heading as="h5" size="lg" color="#00693E" fontWeight="bold" fontStyle="italic" mb={3}>
+            <Heading as="h5" size="lg" color="#00693E" fontWeight="bold" fontStyle="italic" mb={6}>
               Local upload:
             </Heading>
             <Button
@@ -187,7 +187,7 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
               Generate text by ChatGPT:
             </Heading>
             <Box>
-              <Text fontSize="xl" color="#306aa3" fontWeight="bold" mb={1}>
+              <Text fontSize="xl" color="#306aa3" fontWeight="bold" mb={1} mt={5}>
                 ChatGPT:
               </Text>
             </Box>
@@ -246,28 +246,7 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
             </Flex>
           </Box>
           <Divider orientation="horizontal" borderColor="#306aa3" borderWidth="1px" w='80%' />
-          <Box w='80%' textAlign="left">
-            <Heading as="h3" size="lg" color="#00693E" fontWeight="bold" fontStyle="italic" mb={3}>
-              Quick paste:
-            </Heading>
-            <Box
-              bg="#ffffff"
-              borderWidth="3px"
-              borderStyle="dashed"
-              borderColor="#306aa3"
-              borderRadius="12px"
-              h='8vh'
-              w='100%'
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              transition="border 0.3s ease-in-out"
-            >
-              <Text fontSize="lg" color="#306aa3" fontWeight="bold">
-              Copy text directly into the input field.
-              </Text>
-            </Box>
-          </Box>
+          
         </Stack>
       </Box>
       <Box w={{ base: '100%', md: '60%' }} ml={1} mt={1} mr={8}>

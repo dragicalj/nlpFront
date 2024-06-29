@@ -6,18 +6,18 @@ import {
   HStack
 } from '@chakra-ui/react';
 
-function InfoBox({ metadata }) {
+function InfoBox({ numTokens, totalOccurrences, topToken, topWord }) {
   return (
     <Box borderWidth="3px" borderRadius="md" p={4} borderColor="#00693E" mt={1}>
       <HStack spacing={4} align="center">
         <Text>Found:</Text>
-        <Input placeholder="1305" value={metadata ? metadata.num_tokens : ''} isReadOnly />
+        <Input value={numTokens} isReadOnly />
         <Text>Number of occurrences:</Text>
-        <Input placeholder="7722" value={metadata ? metadata.num_occurrences : ''} isReadOnly />
+        <Input value={totalOccurrences} isReadOnly />
         <Text>Top token:</Text>
-        <Input placeholder="," value={metadata ? metadata.top_token : ''} isReadOnly />
+        <Input value={topToken} isReadOnly />
         <Text>Top word:</Text>
-        <Input placeholder="the" value={metadata ? metadata.top_word : ''} isReadOnly />
+        <Input value={topWord} isReadOnly />
       </HStack>
     </Box>
   );

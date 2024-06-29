@@ -14,33 +14,45 @@ import {
   Tr,
   Th,
   Td,
-  Textarea
+  Textarea,
+  Spinner,
+  Alert,
+  AlertIcon,
+  useToast
 } from '@chakra-ui/react';
 import FrequencyRangeSlider from './FrequencyRangeSlider';
 import InfoBox from './InfoBox';
 
-function Frequency({ sharedText, setSharedText, textId, setTextId}) {
+function Frequency({ sharedText, setSharedText, textId, setTextId }) {
   const [texts, setTexts] = useState([]);
   const [selectedTextId, setSelectedTextId] = useState(textId);
   const [selectedTextContent, setSelectedTextContent] = useState(sharedText);
   const [showTable, setShowTable] = useState(false);
   const [tableData, setTableData] = useState([]);
-  const [metadata, setMetadata] = useState(null);
+  const [metadata, setMetadata] = useState({ num_tokens: 0, num_occurrences: 0, top_token: '', top_word: '' });
   const [selectedPartOfSpeech, setSelectedPartOfSpeech] = useState('');
   const [sortOrder, setSortOrder] = useState('relative');
   const [frequencyRange, setFrequencyRange] = useState({ from: 0, to: 100 });
-  const [filteredData, setFilteredData] = useState([]);  
+  const [filteredData, setFilteredData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const toast = useToast();
+
 
   const userId = localStorage.getItem('user_id');
 
   useEffect(() => {
     const fetchTexts = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch(`http://138.68.107.72:8000/api/texts/${userId}/`);
         const data = await response.json();
         setTexts(data);
       } catch (error) {
+        setError('Error fetching texts');
         console.error('Error fetching texts:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchTexts();
@@ -108,6 +120,7 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
   const handleTextSelect = async (event) => {
     const textId = event.target.value;
     setSelectedTextId(textId);
+    setIsLoading(true);
     try {
       const response = await fetch(`http://138.68.107.72:8000/api/texts2/${textId}/`);
       const data = await response.json();
@@ -116,14 +129,19 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
         setSharedText(data.content);
         setTextId(data.id);
       } else {
+        setError('Error fetching text content');
         console.error('Error fetching text content:', data.error);
       }
     } catch (error) {
+      setError('Error fetching text content');
       console.error('Error fetching text content:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleTokenize = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch('http://138.68.107.72:8000/api/tokenize_text/', {
         method: 'POST',
@@ -136,17 +154,40 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
       if (response.ok) {
         setTableData(data);
         setShowTable(true);
-        fetchTextMetadata(selectedTextId);
-        setFilteredData(data);  
+        //fetchTextMetadata(selectedTextId);
+        setFilteredData(data);
+
+        // Calculate metadata
+        const numTokens = data.length;
+        const totalOccurrences = data.reduce((sum, item) => sum + item.concordance, 0);
+        const topToken = data.reduce((prev, current) => (prev.concordance > current.concordance) ? prev : current).text;
+        const topWord = calculateTopWord(data);
+
+        setMetadata({
+          num_tokens: numTokens,
+          num_occurrences: totalOccurrences,
+          top_token: topToken,
+          top_word: topWord
+        });
 
         localStorage.setItem('tableData', JSON.stringify(data));
         localStorage.setItem('showTable', JSON.stringify(true));
         localStorage.setItem('filteredData', JSON.stringify(data));
+        localStorage.setItem('metadata', JSON.stringify({
+          num_tokens: numTokens,
+          num_occurrences: totalOccurrences,
+          top_token: topToken,
+          top_word: topWord
+        }));
       } else {
+        setError('Error tokenizing text');
         console.error('Error tokenizing text:', data.error);
       }
     } catch (error) {
+      setError('Error tokenizing text');
       console.error('Error tokenizing text:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -155,12 +196,14 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
       const response = await fetch(`http://138.68.107.72:8000/text_metadata/${id}/`);
       const data = await response.json();
       if (response.ok) {
-        setMetadata(data); 
-        localStorage.setItem('metadata', JSON.stringify(data)); 
+        setMetadata(data);
+        localStorage.setItem('metadata', JSON.stringify(data));
       } else {
+        setError('Error fetching text metadata');
         console.error('Error fetching text metadata:', data.error);
       }
     } catch (error) {
+      setError('Error fetching text metadata');
       console.error('Error fetching text metadata:', error);
     }
   };
@@ -168,36 +211,77 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
   const handlePartOfSpeechChange = (event) => {
     setSelectedPartOfSpeech(event.target.value);
   };
-  
+
   const handleSortOrderChange = (value) => {
     setSortOrder(value);
   };
-  
+
   const handleFrequencyRangeChange = (from, to) => {
     setFrequencyRange({ from, to });
   };
-  
-  const filterAndSortData = (data) => {
-    let filteredData = [...data];
-  
-    if (selectedPartOfSpeech) {
-      filteredData = filteredData.filter(item => item.type === selectedPartOfSpeech);
-    }
-  
-    filteredData.sort((a, b) => b.concordance - a.concordance);
 
-    const totalItems = filteredData.length;
-    const startIndex = Math.floor(totalItems * (frequencyRange.from / 100));
-    const endIndex = Math.ceil(totalItems * (frequencyRange.to / 100));
-    filteredData = filteredData.slice(startIndex, endIndex);
-  
-    if (sortOrder === 'relative') {
-      filteredData.sort((a, b) => b.concordance - a.concordance);
-    } else if (sortOrder === 'absolute') {
-      filteredData.sort((a, b) => a.text.localeCompare(b.text));
+  const filterAndSortData = (data) => {
+    if ((frequencyRange.from !== 0 && frequencyRange.to !== 100) || (frequencyRange.from >= frequencyRange.to)) {
+      toast({
+        title: "Invalid frequency range.",
+        description: "Please select a range starting from 0 or ending at 100.",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+      return [];
     }
-  
-    return filteredData;
+    let sortedData = [...data].sort((a, b) => b.concordance - a.concordance);
+
+    const totalItems = sortedData.length;
+    console.log(totalItems);
+    let startIndex;
+    let endIndex;
+    if(frequencyRange.to == 100){
+      startIndex=0;
+      const procenat=(frequencyRange.to-frequencyRange.from)/100;
+      endIndex = procenat*totalItems;
+      //const startIndex = Math.floor(totalItems * (frequencyRange.from / 100));
+      console.log(frequencyRange.from);
+      console.log(startIndex);
+      //const endIndex = Math.ceil(totalItems * (frequencyRange.to / 100));
+      console.log(endIndex);
+      console.log(frequencyRange.to);
+    }
+
+    if(frequencyRange.from == 0){
+      endIndex=totalItems;
+      const procenat=(frequencyRange.to-frequencyRange.from)/100;
+      startIndex = totalItems - (procenat*totalItems);
+      //const startIndex = Math.floor(totalItems * (frequencyRange.from / 100));
+      console.log(frequencyRange.from);
+      console.log(startIndex);
+      //const endIndex = Math.ceil(totalItems * (frequencyRange.to / 100));
+      console.log(endIndex);
+      console.log(frequencyRange.to);
+    }
+
+    if(frequencyRange.to==0 && frequencyRange.from==100){
+      startIndex=0;
+      endIndex=totalItems;
+    }
+
+    let rangeData = sortedData.slice(startIndex, endIndex);
+    //const startIndex = Math.floor(totalItems * (frequencyRange.from / 100));
+
+    //let rangeData = sortedData.slice(1, 20);
+
+    if (selectedPartOfSpeech) {
+      rangeData = rangeData.filter(item => item.type === selectedPartOfSpeech);
+    }
+
+    if (sortOrder === 'relative') {
+      rangeData.sort((a, b) => b.concordance - a.concordance);
+    } else if (sortOrder === 'absolute') {
+      rangeData.sort((a, b) => a.text.localeCompare(b.text));
+    }
+
+    return rangeData;
   };
 
   const handleSearch = () => {
@@ -206,30 +290,51 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
     localStorage.setItem('filteredData', JSON.stringify(filteredAndSortedData));
   };
 
+  const calculateTopWord = (data) => {
+    const wordCounts = data.reduce((acc, item) => {
+      if (item.type !== 'Punctuation' && item.type !== 'Other') {
+        acc[item.text] = (acc[item.text] || 0) + item.concordance;
+      }
+      return acc;
+    }, {});
+
+    const topWord = Object.keys(wordCounts).reduce((a, b) => (wordCounts[a] > wordCounts[b] ? a : b), '');
+
+    return topWord;
+  };
+
   return (
     <ChakraProvider>
       <Box p={4}>
         <Box mb={4}>
+          {error && (
+            <Alert status="error" mb={4}>
+              <AlertIcon />
+              {error}
+            </Alert>
+          )}
         </Box>
         <Box display="flex">
           {!showTable ? (
-            <Box flex="1" mr={4}><Text fontSize="md" fontWeight="bold" color="#00693E">Choose another text from your electronic corpus:</Text>
-               <Select placeholder="Select a text..." mb={4} onChange={handleTextSelect}>
-            {texts.map((text) => (
-              <option key={text.id} value={text.id}>{text.title}</option>
-            ))}
-          </Select>
+            <Box flex="1" mr={4}>
+              <Text fontSize="md" fontWeight="bold" color="#00693E">
+                Choose another text from your electronic corpus:
+              </Text>
+              <Select placeholder="Select a text..." mb={4} onChange={handleTextSelect}>
+                {texts.map((text) => (
+                  <option key={text.id} value={text.id}>{text.title}</option>
+                ))}
+              </Select>
               <Textarea placeholder="" value={selectedTextContent} size="lg" minHeight="320px" mb={4} isReadOnly />
-              <Button backgroundColor="#306aa3" width="400px" color="white" onClick={handleTokenize}>
+              <Button backgroundColor="#306aa3" width="400px" color="white" onClick={handleTokenize} isLoading={isLoading}>
                 Tokenize
               </Button>
             </Box>
           ) : (
             <Box flex="1" mr={4}>
-            <Box overflowX="auto" maxHeight="320px">
-              
-                <Table variant="simple" mb='30px'>
-                  <Thead position="sticky" top="0" bg="white" zIndex="1"> 
+              <Box overflowX="auto" maxHeight="320px">
+                <Table variant="simple" mb="30px">
+                  <Thead position="sticky" top="0" bg="white" zIndex="1">
                     <Tr>
                       <Th color="#00693E" fontWeight="bold">Token</Th>
                       <Th color="#00693E" fontWeight="bold">Frequency</Th>
@@ -237,19 +342,22 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {filteredData.map((item, index) => (  
+                    {filteredData.map((item, index) => (
                       <Tr key={index}>
-                        <Td >{item.text}</Td>
+                        <Td>{item.text}</Td>
                         <Td isNumeric>{item.concordance}</Td>
-                        <Td >{item.type}</Td>
+                        <Td>{item.type}</Td>
                       </Tr>
                     ))}
                   </Tbody>
                 </Table>
-              
-              
-            </Box>
-            <InfoBox metadata={metadata} />
+              </Box>
+              <InfoBox 
+                numTokens={metadata.num_tokens} 
+                totalOccurrences={metadata.num_occurrences} 
+                topToken={metadata.top_token}
+                topWord={metadata.top_word} 
+              />
             </Box>
           )}
           <Box width="300px">
@@ -278,9 +386,11 @@ function Frequency({ sharedText, setSharedText, textId, setTextId}) {
             </Box>
             <Box mb={4}>
               <Text mb={2}>Frequency range:</Text>
-              <FrequencyRangeSlider onRangeChange={handleFrequencyRangeChange}/>
+              <FrequencyRangeSlider onRangeChange={handleFrequencyRangeChange} />
             </Box>
-            <Button onClick={handleSearch} backgroundColor="#306aa3" color="white" mb='15px' width={'300px'}>Apply</Button>
+            <Button onClick={handleSearch} backgroundColor="#306aa3" color="white" mb="15px" width="300px">
+              Apply
+            </Button>
           </Box>
         </Box>
       </Box>
