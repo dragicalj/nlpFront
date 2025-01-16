@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -17,17 +17,19 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter
+  ModalFooter,
+  Select,
 } from "@chakra-ui/react";
 import { FaPaperPlane, FaUpload, FaBook, FaPaste } from "react-icons/fa";
 
 const TextGenerationPage = ({ setSharedText, setTextId }) => {
-  const [uploadedText, setUploadedText] = useState('');
-  const [title, setTitle] = useState('');
-  const [userMessage, setUserMessage] = useState('');
-  const [generatedText, setGeneratedText] = useState('');
+  const [uploadedText, setUploadedText] = useState("");
+  const [title, setTitle] = useState("");
+  const [userMessage, setUserMessage] = useState("");
+  const [generatedText, setGeneratedText] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [modalMessage, setModalMessage] = useState('');
+  const [modalMessage, setModalMessage] = useState("");
+  const [selectedLLM, setSelectedLLM] = useState("ChatGPT"); // New state for selected LLM
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -39,18 +41,18 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
         setUploadedText(text);
         setSharedText(text);
 
-        localStorage.removeItem('tableData');
-        localStorage.removeItem('showTable');
-        localStorage.removeItem('selectedPartOfSpeech');
-        localStorage.removeItem('sortOrder');
-        localStorage.removeItem('frequencyRange');
-        localStorage.removeItem('filteredData');
-        localStorage.removeItem('selectedTextId');
-        localStorage.removeItem('selectedTextContent');
-        localStorage.removeItem('metadata');
-        localStorage.removeItem('shouldLoadState');
+        localStorage.removeItem("tableData");
+        localStorage.removeItem("showTable");
+        localStorage.removeItem("selectedPartOfSpeech");
+        localStorage.removeItem("sortOrder");
+        localStorage.removeItem("frequencyRange");
+        localStorage.removeItem("filteredData");
+        localStorage.removeItem("selectedTextId");
+        localStorage.removeItem("selectedTextContent");
+        localStorage.removeItem("metadata");
+        localStorage.removeItem("shouldLoadState");
       } catch (error) {
-        console.error('Error reading file:', error);
+        console.error("Error reading file:", error);
       }
     }
   };
@@ -70,42 +72,47 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
       setUploadedText(text);
       setSharedText(text);
     } catch (error) {
-      console.error('Failed to read clipboard contents: ', error);
+      console.error("Failed to read clipboard contents: ", error);
     }
   };
 
   const handleGenerateText = async () => {
     try {
-      const response = await fetch(`http://138.68.107.72:8000/api/generate_text/?prompt=${encodeURIComponent(userMessage)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/generate_text/?prompt=${encodeURIComponent(
+          userMessage
+        )}&model=${selectedLLM}`, // Passing the selected LLM model
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const data = await response.json();
       if (response.ok) {
         setGeneratedText(data.generated_text);
-        setUploadedText(data.generated_text); 
-        setSharedText(data.generated_text); 
+        setUploadedText(data.generated_text);
+        setSharedText(data.generated_text);
 
-        localStorage.removeItem('tableData');
-        localStorage.removeItem('showTable');
-        localStorage.removeItem('selectedPartOfSpeech');
-        localStorage.removeItem('sortOrder');
-        localStorage.removeItem('frequencyRange');
-        localStorage.removeItem('filteredData');
-        localStorage.removeItem('selectedTextId');
-        localStorage.removeItem('selectedTextContent');
-        localStorage.removeItem('metadata');
-        localStorage.removeItem('shouldLoadState');
+        localStorage.removeItem("tableData");
+        localStorage.removeItem("showTable");
+        localStorage.removeItem("selectedPartOfSpeech");
+        localStorage.removeItem("sortOrder");
+        localStorage.removeItem("frequencyRange");
+        localStorage.removeItem("filteredData");
+        localStorage.removeItem("selectedTextId");
+        localStorage.removeItem("selectedTextContent");
+        localStorage.removeItem("metadata");
+        localStorage.removeItem("shouldLoadState");
       } else {
-        console.error('Error generating text:', data.error);
+        console.error("Error generating text:", data.error);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
-  
+
   const handleSaveText = async () => {
     if (!title) {
       setModalMessage("You must enter a text title.");
@@ -121,39 +128,46 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
     const textData = {
       title: title,
       content: uploadedText,
-      user: localStorage.getItem('user_id')
+      user: localStorage.getItem("user_id"),
     };
-  
+
     try {
-      const response = await fetch('http://138.68.107.72:8000/api/create_text/', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8000/api/create_text/", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(textData),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
-        console.log('Text saved successfully:', data.id);
+        console.log("Text saved successfully:", data.id);
         setTextId(data.id);
         setModalMessage("Text saved successfully to your electronic corpus.");
         onOpen();
       } else {
         const errorData = await response.json();
-        console.error('Error saving text:', errorData);
+        console.error("Error saving text:", errorData);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
-  
+
   return (
-    <Flex flexDir='row' p={4} bg="white" borderRadius="10px">
-      <Box flex="1" mr={4} w={{ base: '100%', md: '40%' }} mt={12}>
+    <Flex flexDir="row" p={4} bg="white" borderRadius="10px">
+      <Box flex="1" mr={4} w={{ base: "100%", md: "40%" }} mt={12}>
         <Stack align="center" spacing={5}>
-          <Box w='80%' textAlign="left">
-            <Heading as="h5" size="lg" color="#00693E" fontWeight="bold" fontStyle="italic" mb={6}>
+          <Box w="80%" textAlign="left">
+            <Heading
+              as="h5"
+              size="lg"
+              color="#00693E"
+              fontWeight="bold"
+              fontStyle="italic"
+              mb={6}
+            >
               Local upload:
             </Heading>
             <Button
@@ -167,8 +181,8 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
               cursor="pointer"
               transition="border 0.3s ease-in-out"
               _hover={{ borderColor: "#306aa3" }}
-              h='8vh'
-              w='100%'
+              h="8vh"
+              w="100%"
             >
               <FaUpload fontSize="2em" mb={2} color="#306aa3" />
               Click to Upload
@@ -181,35 +195,54 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
               onChange={handleFileUpload}
             />
           </Box>
-          <Divider orientation="horizontal" borderColor="#306aa3" borderWidth="1px" w='80%' />
-          <Box w='80%' textAlign="left">
-            <Heading as="h3" size="lg" color="#00693E" fontWeight="bold" fontStyle="italic" >
-              Generate text by ChatGPT:
+          <Divider
+            orientation="horizontal"
+            borderColor="#306aa3"
+            borderWidth="1px"
+            w="80%"
+          />
+          <Box w="80%" textAlign="left">
+            <Heading
+              as="h3"
+              size="lg"
+              color="#00693E"
+              fontWeight="bold"
+              fontStyle="italic"
+            >
+              Generate text using AI:
             </Heading>
             <Box>
-              <Text fontSize="xl" color="#306aa3" fontWeight="bold" mb={1} mt={5}>
-                ChatGPT:
+              <Text
+                fontSize="xl"
+                color="#306aa3"
+                fontWeight="bold"
+                mb={1}
+                mt={5}
+              >
+                Select Model:
               </Text>
-            </Box>
-            <Box
-              mb={1}
-              backgroundColor='#306aa3'
-              borderRadius="10px"
-              w='100%'
-              h='6vh'
-              display="flex"
-              alignItems="left"
-              justifyContent="left"
-            >
-              <Flex ml={3} mt={1} h="100%" fontSize="sm">
-                <Text color="white">
-                  Hello! How can I assist you today?
-                </Text>
-              </Flex>
+              <Select
+                value={selectedLLM}
+                onChange={(e) => setSelectedLLM(e.target.value)}
+                borderWidth="2px"
+                borderRadius="8px"
+                fontSize="xs"
+                color="#495057"
+                w="100%"
+                borderColor="#306aa3"
+                mb={3}
+              >
+                <option value="chatgpt">ChatGPT</option>
+                <option value="llama">Llama</option>
+                <option value="gemini">Gemini</option>
+                <option value="claude">Claude</option>
+                <option value="command">Command</option>
+                <option value="qwen">Qwen</option>
+              </Select>
             </Box>
             <Box>
               <Text fontSize="xl" color="#306aa3" fontWeight="bold" mb={1}>
-                User:
+                Prompt:
               </Text>
             </Box>
             <Flex alignItems="center">
@@ -225,7 +258,7 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
                 maxHeight="50px"
                 rows={2}
                 resize="none"
-                w='100%'
+                w="100%"
                 p={2}
                 borderColor="#306aa3"
               />
@@ -245,62 +278,72 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
               </Button>
             </Flex>
           </Box>
-          <Divider orientation="horizontal" borderColor="#306aa3" borderWidth="1px" w='80%' />
-          
+          <Divider
+            orientation="horizontal"
+            borderColor="#306aa3"
+            borderWidth="1px"
+            w="80%"
+          />
         </Stack>
       </Box>
-      <Box w={{ base: '100%', md: '60%' }} ml={1} mt={1} mr={8}>
-  <Flex justifyContent="space-between" alignItems="center">
-    <Heading as="h3" size="lg" color="#00693E" fontWeight="bold" fontStyle="italic">
-      Text for Analysis
-    </Heading>
-    <Button
-      onClick={handleSaveText}
-      bg="#00693E"
-      color="white"
-      borderRadius="25px"
-      _hover={{ bg: "#004d2e" }}
-      p={3}
-      w="auto"
-      width="36%"
-      height="6vh"
-      leftIcon={<FaBook />}
-      style={{ fontSize: '1em' }}
-    >
-      Save text to electronic corpus
-    </Button>
-  </Flex>
-  <Flex alignItems="center" mt={4}>
-    <Text fontSize="lg" color="#306aa3" fontWeight="bold" mr={3}>
-      Title of the text:
-    </Text>
-    <Input
-      placeholder="Enter text title"
-      value={title}
-      onChange={(e) => setTitle(e.target.value)}
-      size="sm"
-      width="auto"
-      flexGrow={1}
-      padding="8px"
-      borderRadius="8px"
-    />
-  </Flex>
-  <Textarea
+      <Box w={{ base: "100%", md: "60%" }} ml={1} mt={1} mr={8}>
+        <Flex justifyContent="space-between" alignItems="center">
+          <Heading
+            as="h3"
+            size="lg"
+            color="#00693E"
+            fontWeight="bold"
+            fontStyle="italic"
+          >
+            Text for Analysis
+          </Heading>
+          <Button
+            onClick={handleSaveText}
+            bg="#00693E"
+            color="white"
+            borderRadius="25px"
+            _hover={{ bg: "#004d2e" }}
+            p={3}
+            w="auto"
+            width="36%"
+            height="6vh"
+            leftIcon={<FaBook />}
+            style={{ fontSize: "1em" }}
+          >
+            Save text to electronic corpus
+          </Button>
+        </Flex>
+        <Flex alignItems="center" mt={4}>
+          <Text fontSize="lg" color="#306aa3" fontWeight="bold" mr={3}>
+            Title of the text:
+          </Text>
+          <Input
+            placeholder="Enter text title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            size="sm"
+            width="auto"
+            flexGrow={1}
+            padding="8px"
+            borderRadius="8px"
+          />
+        </Flex>
+        <Textarea
           placeholder="Your text here..."
           value={uploadedText}
           onChange={(e) => {
             setUploadedText(e.target.value);
             setSharedText(e.target.value);
-            localStorage.removeItem('tableData');
-        localStorage.removeItem('showTable');
-        localStorage.removeItem('selectedPartOfSpeech');
-        localStorage.removeItem('sortOrder');
-        localStorage.removeItem('frequencyRange');
-        localStorage.removeItem('filteredData');
-        localStorage.removeItem('selectedTextId');
-        localStorage.removeItem('selectedTextContent');
-        localStorage.removeItem('metadata');
-        localStorage.removeItem('shouldLoadState');
+            localStorage.removeItem("tableData");
+            localStorage.removeItem("showTable");
+            localStorage.removeItem("selectedPartOfSpeech");
+            localStorage.removeItem("sortOrder");
+            localStorage.removeItem("frequencyRange");
+            localStorage.removeItem("filteredData");
+            localStorage.removeItem("selectedTextId");
+            localStorage.removeItem("selectedTextContent");
+            localStorage.removeItem("metadata");
+            localStorage.removeItem("shouldLoadState");
           }}
           height="60vh"
           resize="none"
@@ -313,24 +356,22 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
           mt={4}
         />
 
-  <Modal isOpen={isOpen} onClose={onClose}>
-    <ModalOverlay />
-    <ModalContent>
-      <ModalHeader>Notification</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        {modalMessage}
-      </ModalBody>
-      <ModalFooter>
-        <Button colorScheme="blue" onClick={onClose}>
-          OK
-        </Button>
-      </ModalFooter>
-    </ModalContent>
-  </Modal>
-</Box>
-</Flex>
-);
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Notification</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>{modalMessage}</ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" onClick={onClose}>
+                OK
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Box>
+    </Flex>
+  );
 };
 
 export default TextGenerationPage;
