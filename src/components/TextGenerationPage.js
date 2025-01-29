@@ -241,6 +241,7 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
                 <option value="claude">Claude</option>
                 <option value="command">Command</option>
                 <option value="qwen">Qwen</option>
+                <option value="deepseek">DeepSeek</option>
               </Select>
             </Box>
             <Box>
