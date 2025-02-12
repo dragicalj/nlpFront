@@ -21,6 +21,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { FaPaperPlane, FaUpload, FaBook, FaPaste } from "react-icons/fa";
+import TextValidationModule from './TextValidationModule';
 
 const TextGenerationPage = ({ setSharedText, setTextId }) => {
   const [uploadedText, setUploadedText] = useState("");
@@ -349,7 +350,7 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
             localStorage.removeItem("metadata");
             localStorage.removeItem("shouldLoadState");
           }}
-          height="60vh"
+          height="48vh"
           resize="none"
           borderWidth="2px"
           borderColor="#306aa3"
@@ -359,7 +360,7 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
           overflowY="scroll"
           mt={4}
         />
-
+      <TextValidationModule uploadedText={uploadedText} setUploadedText={setUploadedText} setSharedText={setSharedText}  />
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
