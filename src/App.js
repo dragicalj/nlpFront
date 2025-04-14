@@ -18,11 +18,11 @@ import Frequency from './components/Frequency';
 function App() {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [sharedText, setSharedText] = useState('');
-  const[textId, setTextId]=useState(''); // Dodajemo stanje za zadržavanje teksta
+  const[textId, setTextId]=useState(''); 
 
   return (
     <Router>
-      {isLoggedIn && <CustomHeader />}
+      {isLoggedIn && <CustomHeader onLogout={() => setLoggedIn(false)} />}
 
       <Routes>
         <Route path="/login" element={<LoginPage onLogin={() => setLoggedIn(true)} />} />

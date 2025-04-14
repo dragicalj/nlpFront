@@ -126,8 +126,10 @@ const Statistical = ({ sharedText, setSharedText, textId, setTextId }) => {
       const response = await fetch(`http://138.68.107.72:8000/api/text_entropy_shannon/${id}/`);
       const data = await response.json();
       if (response.ok) {
-        setEntropy(data.entropy);
-        setShannonValue(data.shannon_value);
+        const entropyRounded = parseFloat(Number(data.entropy).toFixed(4));
+        const shannonRounded = parseFloat(Number(data.shannon_value).toFixed(4));
+        setEntropy(entropyRounded);
+        setShannonValue(shannonRounded);
       } else {
         console.error('Error fetching text metadata:', data.error);
       }
@@ -219,7 +221,7 @@ const Statistical = ({ sharedText, setSharedText, textId, setTextId }) => {
               alignItems="center"
               justifyContent="center"
             >
-              Entropy of the text:
+              Entropy:
             </Box>
 
             <Textarea
