@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Flex,
@@ -13,7 +13,7 @@ import {
   useToast,
   Text
 } from '@chakra-ui/react';
-import { FaChartBar } from 'react-icons/fa'; 
+import { FaChartBar } from 'react-icons/fa';
 import axios from 'axios';
 
 function LoginPage({ onLogin }) {
@@ -23,23 +23,48 @@ function LoginPage({ onLogin }) {
   const navigate = useNavigate();
   const toast = useToast();
 
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'Enter') {
+        handleLogin();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [username, password]); 
+
+
   const handleLogin = async () => {
+    if (!username || !password) {
+      toast({
+        title: "Missing fields",
+        description: "Please enter both username and password.",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
     try {
       const response = await fetch('http://138.68.107.72:8000/login/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-            }),
-        });
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
 
       if (response.status === 200) {
         const data = await response.json();
         localStorage.setItem('user_id', data.id);
-        console.log('User ID:', data.id); 
+        console.log('User ID:', data.id);
         localStorage.removeItem('tableData');
         localStorage.removeItem('showTable');
         localStorage.removeItem('selectedPartOfSpeech');
@@ -85,7 +110,7 @@ function LoginPage({ onLogin }) {
       <Box p="2%" minWidth="30%" maxWidth="80%" borderWidth={1} borderRadius="8px" boxShadow="lg" bg="white">
         <Box textAlign="center">
           <Flex alignItems="center" justify="center" marginBottom="1%">
-            <FaChartBar color="#1f4c76" size="40px" style={{ marginRight: '2%' }} /> 
+            <FaChartBar color="#1f4c76" size="40px" style={{ marginRight: '2%' }} />
             <Heading color="#1f4c76" size="lg">Welcome to QuanTA</Heading>
           </Flex>
           <Text fontSize="md" color="gray.600" marginBottom="3%">Please sign in to continue</Text>
@@ -118,7 +143,7 @@ function LoginPage({ onLogin }) {
                 </InputRightElement>
               </InputGroup>
             </FormControl>
-            <Button width="100%" mt="3%" backgroundColor="#1f4c76" color="white" _hover={{ bg: "#163d57" }} size="md" fontSize="md" onClick={handleLogin}>
+            <Button type="button" width="100%" mt="3%" backgroundColor="#1f4c76" color="white" _hover={{ bg: "#163d57" }} size="md" fontSize="md" onClick={handleLogin}>
               Sign in
             </Button>
           </form>
