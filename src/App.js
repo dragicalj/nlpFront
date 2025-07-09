@@ -22,7 +22,7 @@ function App() {
 
   return (
     <Router>
-      {isLoggedIn && <CustomHeader onLogout={() => setLoggedIn(false)} />}
+      {isLoggedIn && <CustomHeader setSharedText={setSharedText} setTextId={setTextId} onLogout={() => setLoggedIn(false)} />}
 
       <Routes>
         <Route path="/login" element={<LoginPage onLogin={() => setLoggedIn(true)} />} />

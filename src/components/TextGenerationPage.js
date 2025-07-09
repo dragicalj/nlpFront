@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -19,17 +19,25 @@ import {
   ModalBody,
   ModalFooter,
   Select,
+  HStack
 } from "@chakra-ui/react";
-import { FaPaperPlane, FaUpload, FaBook, FaPaste } from "react-icons/fa";
+import { FaPaperPlane, FaUpload, FaBook, FaPaste, FaBroom } from "react-icons/fa";
 
 const TextGenerationPage = ({ setSharedText, setTextId }) => {
-  const [uploadedText, setUploadedText] = useState("");
+  const [uploadedText, setUploadedText] = useState(() => {
+    return localStorage.getItem("uploadedText") || "";
+  });
+
   const [title, setTitle] = useState("");
   const [userMessage, setUserMessage] = useState("");
   const [generatedText, setGeneratedText] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [modalMessage, setModalMessage] = useState("");
   const [selectedLLM, setSelectedLLM] = useState("ChatGPT"); // New state for selected LLM
+
+  useEffect(() => {
+    localStorage.setItem("uploadedText", uploadedText);
+  }, [uploadedText]);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -301,21 +309,51 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
           >
             Text for Analysis
           </Heading>
-          <Button
-            onClick={handleSaveText}
-            bg="#00693E"
-            color="white"
-            borderRadius="25px"
-            _hover={{ bg: "#004d2e" }}
-            p={3}
-            w="auto"
-            width="36%"
-            height="6vh"
-            leftIcon={<FaBook />}
-            style={{ fontSize: "1em" }}
-          >
-            Save text to electronic corpus
-          </Button>
+          
+            <Button
+              onClick={handleSaveText}
+              bg="#00693E"
+              color="white"
+              borderRadius="25px"
+              _hover={{ bg: "#004d2e" }}
+              p={3}
+              w="auto"
+              width="36%"
+              height="6vh"
+              leftIcon={<FaBook />}
+              style={{ fontSize: "1em" }}
+              ml={20}
+            >
+              Save text to electronic corpus
+            </Button>
+            <Button
+              onClick={() => {
+                setUploadedText("");
+                setSharedText("");
+                localStorage.removeItem("uploadedText");
+                localStorage.removeItem("tableData");
+                localStorage.removeItem("showTable");
+                localStorage.removeItem("selectedPartOfSpeech");
+                localStorage.removeItem("sortOrder");
+                localStorage.removeItem("frequencyRange");
+                localStorage.removeItem("filteredData");
+                localStorage.removeItem("selectedTextId");
+                localStorage.removeItem("selectedTextContent");
+                localStorage.removeItem("metadata");
+                localStorage.removeItem("shouldLoadState");
+              }}
+              bg="#D65A17"
+              color="white"
+              borderRadius="25px"
+              _hover={{ bg: "#C05621" }}
+              p={3}
+              w="auto"
+              width="20%"
+              height="6vh"
+              leftIcon={<FaBroom />}
+            >
+              Clear
+            </Button>
         </Flex>
         <Flex alignItems="center" mt={4}>
           <Text fontSize="lg" color="#306aa3" fontWeight="bold" mr={3}>

@@ -10,22 +10,15 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { Button, useToast } from '@chakra-ui/react';
 
-function CustomHeader({ onLogout }) {
+function CustomHeader({ setSharedText, setTextId, onLogout }) {
     const navigate = useNavigate();
     const toast = useToast();
 
     const handleLogout = () => {
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('tableData');
-        localStorage.removeItem('showTable');
-        localStorage.removeItem('selectedPartOfSpeech');
-        localStorage.removeItem('sortOrder');
-        localStorage.removeItem('frequencyRange');
-        localStorage.removeItem('filteredData');
-        localStorage.removeItem('selectedTextId');
-        localStorage.removeItem('selectedTextContent');
-        localStorage.removeItem('metadata');
-        localStorage.removeItem('shouldLoadState');
+        localStorage.clear();
+
+        setSharedText("");     
+        setTextId(null);       
 
         toast({
             title: "Logged out",
