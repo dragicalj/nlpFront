@@ -34,6 +34,8 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [modalMessage, setModalMessage] = useState("");
   const [selectedLLM, setSelectedLLM] = useState("ChatGPT"); // New state for selected LLM
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     localStorage.setItem("uploadedText", uploadedText);
@@ -85,6 +87,7 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
   };
 
   const handleGenerateText = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         `http://138.68.107.72:8000/api/generate_text/?prompt=${encodeURIComponent(
@@ -118,6 +121,9 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
       }
     } catch (error) {
       console.error("Error:", error);
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -286,6 +292,8 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
                 transition="background-color 0.2s"
                 _hover={{ backgroundColor: "#0056b3" }}
                 onClick={handleGenerateText}
+                isLoading={isLoading}
+                isDisabled={isLoading}
               >
                 <FaPaperPlane />
               </Button>
@@ -310,51 +318,51 @@ const TextGenerationPage = ({ setSharedText, setTextId }) => {
           >
             Text for Analysis
           </Heading>
-          
-            <Button
-              onClick={handleSaveText}
-              bg="#00693E"
-              color="white"
-              borderRadius="25px"
-              _hover={{ bg: "#004d2e" }}
-              p={3}
-              w="auto"
-              width="36%"
-              height="6vh"
-              leftIcon={<FaBook />}
-              style={{ fontSize: "1em" }}
-              ml={20}
-            >
-              Save text to electronic corpus
-            </Button>
-            <Button
-              onClick={() => {
-                setUploadedText("");
-                setSharedText("");
-                localStorage.removeItem("uploadedText");
-                localStorage.removeItem("tableData");
-                localStorage.removeItem("showTable");
-                localStorage.removeItem("selectedPartOfSpeech");
-                localStorage.removeItem("sortOrder");
-                localStorage.removeItem("frequencyRange");
-                localStorage.removeItem("filteredData");
-                localStorage.removeItem("selectedTextId");
-                localStorage.removeItem("selectedTextContent");
-                localStorage.removeItem("metadata");
-                localStorage.removeItem("shouldLoadState");
-              }}
-              bg="#D65A17"
-              color="white"
-              borderRadius="25px"
-              _hover={{ bg: "#C05621" }}
-              p={3}
-              w="auto"
-              width="20%"
-              height="6vh"
-              leftIcon={<FaBroom />}
-            >
-              Clear
-            </Button>
+
+          <Button
+            onClick={handleSaveText}
+            bg="#00693E"
+            color="white"
+            borderRadius="25px"
+            _hover={{ bg: "#004d2e" }}
+            p={3}
+            w="auto"
+            width="36%"
+            height="6vh"
+            leftIcon={<FaBook />}
+            style={{ fontSize: "1em" }}
+            ml={20}
+          >
+            Save text to electronic corpus
+          </Button>
+          <Button
+            onClick={() => {
+              setUploadedText("");
+              setSharedText("");
+              localStorage.removeItem("uploadedText");
+              localStorage.removeItem("tableData");
+              localStorage.removeItem("showTable");
+              localStorage.removeItem("selectedPartOfSpeech");
+              localStorage.removeItem("sortOrder");
+              localStorage.removeItem("frequencyRange");
+              localStorage.removeItem("filteredData");
+              localStorage.removeItem("selectedTextId");
+              localStorage.removeItem("selectedTextContent");
+              localStorage.removeItem("metadata");
+              localStorage.removeItem("shouldLoadState");
+            }}
+            bg="#D65A17"
+            color="white"
+            borderRadius="25px"
+            _hover={{ bg: "#C05621" }}
+            p={3}
+            w="auto"
+            width="20%"
+            height="6vh"
+            leftIcon={<FaBroom />}
+          >
+            Clear
+          </Button>
         </Flex>
         <Flex alignItems="center" mt={4}>
           <Text fontSize="lg" color="#306aa3" fontWeight="bold" mr={3}>
